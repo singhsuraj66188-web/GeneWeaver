@@ -42,27 +42,34 @@ GeneWeaver is an individual internship project focused on DNA sequence alignment
 
 ## Current Status
 
-**Phase:** Environment and Project Setup
+**Phase:** Phase 1 — Environment and Project Setup
 
 **Completed:**
-- GitHub repository created.
-- Local repository cloned.
-- Python 3.12 virtual environment created.
-- Initial folder structure created.
-- README and `.gitignore` created.
+- GitHub repository created and connected.
+- Local Git repository initialized.
+- Python 3.12.10 virtual environment configured.
+- Initial project documentation created.
+- README and .gitignore created.
+- System architecture documented.
+- Initial documentation commit pushed to GitHub.
 
 **Pending:**
-- Architecture documentation.
-- Implementation and automated tests.
-- GPU compatibility evaluation.
-- Benchmarking and final report.
+- Review official project requirements.
+- Finalize the alignment algorithm.
+- Develop the CPU reference implementation.
+- Add automated correctness tests.
+- Evaluate GPU compatibility.
+- Implement GPU acceleration if technically feasible.
+- Benchmark and document results.
 
 ## Technical Constraints
 
 - Development environment: Windows.
 - Python version: 3.12.10.
 - GPU: NVIDIA GeForce MX130 with 2 GB VRAM.
-- CUDA Toolkit availability and GPU-library compatibility must be verified before selecting a GPU implementation.
+- CUDA Toolkit (`nvcc`) was not detected during initial inspection.
+- GPU-library compatibility must be verified before selecting a GPU implementation.
+- CPU execution must remain available as a fallback.
 
 ## Important Note
 
