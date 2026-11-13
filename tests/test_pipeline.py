@@ -47,3 +47,54 @@ def test_pipeline_rejects_invalid_dna(tmp_path):
 
     with pytest.raises(ValueError, match="Invalid DNA nucleotides"):
         process_fasta(fasta_file)
+def test_pipeline_aligns_target_across_fasta_records():
+    records = process_fasta(
+        "data/sample.fasta",
+        target="ATGC",
+        max_mismatches=0,
+    )
+
+    assert len(records) == 3
+    assert all("matches" in record for record in records)
+
+
+def test_pipeline_preserves_old_output_without_target():
+    records = process_fasta("data/sample.fasta")
+
+    assert all("matches" not in record for record in records)
+
+
+def test_pipeline_finds_reverse_strand_match(tmp_path):
+    fasta_file = tmp_path / "reverse.fasta"
+    fasta_file.write_text(">gene_reverse\nCCGTTAA\n")
+
+    records = process_fasta(
+        fasta_file,
+        target="AAC",
+        max_mismatches=0,
+    )
+
+    matches = records[0]["matches"]
+
+    assert len(matches) == 1
+    assert matches[0]["strand"] == "-"
+    assert matches[0]["start"] == 2
+
+
+def test_pipeline_supports_mismatches(tmp_path):
+    fasta_file = tmp_path / "mismatch.fasta"
+    fasta_file.write_text(">gene_mismatch\nATG\n")
+
+    records = process_fasta(
+        fasta_file,
+        target="ACG",
+        max_mismatches=1,
+        both_strands=False,
+    )
+
+    assert records[0]["matches"][0]["mismatches"] == 1
+
+
+def test_pipeline_rejects_invalid_target():
+    with pytest.raises(ValueError):
+        process_fasta("data/sample.fasta", target="ATGX")
