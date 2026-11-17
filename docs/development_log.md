@@ -1,4 +1,4 @@
-﻿# GeneWeaver - Development Log
+# GeneWeaver - Development Log
 
 This document records daily development activities, implementation progress,
 testing results, benchmarks, documentation, and Git contributions.
@@ -159,3 +159,82 @@ Implement Guide RNA validation and DNA/RNA conversion functionality, then verify
 Successfully implemented Guide RNA validation and DNA/RNA conversion functionality.
 All 20 dedicated Guide RNA tests passed, and the complete GeneWeaver
 test suite increased from 79 to 98 passing tests.
+
+## Day 8 - November 17, 2026
+
+### Objective
+Implement integrated CRISPR target search using Guide RNA and SpCas9 PAM detection, then benchmark its end-to-end CPU performance.
+
+### Work Completed
+- Created src/geneweaver/crispr_search.py.
+- Integrated Guide RNA validation and RNA-to-DNA conversion.
+- Integrated forward and reverse strand DNA alignment.
+- Integrated SpCas9 PAM detection.
+- Implemented guide/PAM coordinate matching.
+- Added CRISPR candidate results containing genomic coordinates, strand, matched sequence, mismatch count, PAM information, and guide information.
+- Created tests/test_crispr_search.py with 11 dedicated test cases.
+- Corrected the test-file location by moving the CRISPR search tests into the main tests directory.
+- Created benchmarks/benchmark_crispr_search.py to measure complete CRISPR search execution.
+- Benchmarked deterministic synthetic DNA references of 10,000, 100,000, and 1,000,000 bases.
+- Recorded median execution time and throughput across three runs per dataset.
+- Verified detection of the deliberately inserted target in all three datasets.
+- Created docs/crispr_benchmark.md to document benchmark methodology, results, observations, and limitations.
+
+### Testing Results
+
+| Test Category | Result |
+|---|---:|
+| Alignment tests | 26 passed |
+| Chunking tests | 8 passed |
+| CRISPR search tests | 11 passed |
+| FASTA parser tests | 3 passed |
+| Guide RNA tests | 20 passed |
+| PAM detection tests | 13 passed |
+| Pipeline tests | 11 passed |
+| Sequence validation tests | 13 passed |
+| Reverse complement tests | 4 passed |
+| Complete test suite | 109 passed |
+| Failed tests | 0 |
+| Final full-suite execution | 9.29 seconds |
+
+### CRISPR Search Benchmark Results
+
+| Dataset | Reference size | Median execution time | Throughput | Candidates |
+|---|---:|---:|---:|---:|
+| Small | 10,000 bases | 0.045372 s | 220,398 bases/s | 1 |
+| Medium | 100,000 bases | 0.450947 s | 221,755 bases/s | 1 |
+| Large | 1,000,000 bases | 4.042041 s | 247,400 bases/s | 1 |
+
+### Benchmark Environment
+- Operating System: Windows 10
+- Python: 3.12.10
+- pytest: 9.2.0
+- Search strands: Forward and reverse
+- Guide RNA length: 20 bases
+- PAM pattern: NGG
+- Runs per dataset: 3
+- Measurement: Median execution time
+- Reference data: Deterministic synthetic DNA sequences
+
+### Files Created
+- src/geneweaver/crispr_search.py
+- tests/test_crispr_search.py
+- benchmarks/benchmark_crispr_search.py
+- docs/crispr_benchmark.md
+
+### Files Updated
+- docs/development_log.md
+
+### Git Contributions
+- First Day 8 commit: 2dc5e9b - feat: add CRISPR target search
+- First Day 8 commit successfully pushed to origin/main.
+- Additional benchmark and documentation changes prepared for a second Day 8 commit.
+
+### Outcome
+Successfully implemented integrated CRISPR target search with Guide RNA and PAM validation.
+
+All 11 dedicated CRISPR search tests passed. The complete project test suite reached 109 passing tests with zero failures.
+
+The end-to-end benchmark successfully detected the expected CRISPR target in all three synthetic reference datasets. Measured CPU throughput ranged from approximately 220,000 to 247,000 bases per second.
+
+The recorded measurements provide an initial CPU performance baseline for future GeneWeaver optimization and GPU acceleration.
