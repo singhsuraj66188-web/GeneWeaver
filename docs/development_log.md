@@ -335,3 +335,63 @@ Add a reporting utility to summarize CRISPR search results and provide useful st
 
 - Supplementary feature implemented after the primary Day 9 commit.
 - Separate commit to be recorded after successful verification and push.
+
+## Day 10 - November 19, 2026
+
+### Objective
+Implement a CRISPR candidate ranking and prioritization system to organize guide RNA target matches according to mismatch-based scoring.
+
+### Work Completed
+
+- Created `src/geneweaver/candidate_ranking.py`.
+- Implemented `calculate_candidate_score()` to calculate candidate scores using mismatch counts.
+- Implemented `rank_crispr_candidates()` to rank candidates from highest to lowest score.
+- Established a scoring system starting at 100 points, with a 10-point penalty per mismatch.
+- Implemented deterministic sorting using score, genomic start, genomic end, and strand.
+- Preserved original candidate information, including PAM sequences, guide information, genomic coordinates, and strand.
+- Added sequential ranking numbers to candidate results.
+- Implemented input validation for candidate dictionaries, coordinates, mismatch counts, and strand information.
+- Ensured that the original candidate dictionaries remain unchanged.
+
+### Testing and Validation
+
+Created two test files:
+
+- `tests/test_candidate_ranking.py`
+- `tests/test_candidate_ranking_integration.py`
+
+Unit tests covered:
+- Exact-match prioritization.
+- Candidate score calculation.
+- Mismatch-based ranking.
+- Deterministic tie-breaking.
+- Forward and reverse strand preservation.
+- Genomic coordinate preservation.
+- Empty candidate lists.
+- Invalid input handling.
+- Sequential ranking numbers.
+- Original candidate data preservation.
+
+Integration tests verified:
+- Ranking actual CRISPR search results.
+- Preservation of PAM and guide RNA information.
+- Reverse-strand candidate compatibility.
+
+### Test Results
+
+- Candidate ranking unit tests: 15 passed.
+- Candidate ranking integration tests: 3 passed.
+- Previous project tests: 123 passed.
+- Total tests: 141 passed.
+- Failed tests: 0.
+- Full test suite execution time: 1.04 seconds.
+
+### Outcome
+
+Successfully implemented and tested a deterministic CRISPR candidate ranking system integrated with the existing CRISPR target search engine.
+
+The ranking module provides a foundation for future candidate prioritization and reporting functionality.
+
+### Git Status
+
+Pending Day 10 commit and GitHub push.
