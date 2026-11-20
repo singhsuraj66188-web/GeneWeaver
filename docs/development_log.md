@@ -395,3 +395,29 @@ The ranking module provides a foundation for future candidate prioritization and
 ### Git Status
 
 Pending Day 10 commit and GitHub push.
+
+
+## Day 11 - November 20, 2026
+
+### Objective
+Implement and validate CRISPR off-target analysis functionality.
+
+### Work Completed
+- Implemented off-target candidate grouping by guide RNA.
+- Added intended target identification using genomic coordinates and strand information.
+- Implemented exact and mismatched off-target counting.
+- Added forward and reverse strand analysis.
+- Implemented mismatch distribution reporting.
+- Added a heuristic specificity score based on mismatch-weighted off-target counts.
+- Added input validation and error handling.
+- Created tests/test_off_target.py with 10 focused test cases.
+
+### Testing Results
+- Focused off-target tests: 10 passed.
+- Complete project test suite: 151 passed.
+- Execution time: 12.87 seconds.
+- No test failures or errors.
+
+### Outcome
+Successfully implemented and tested the off-target analysis module. All existing project tests continue to pass.
+
