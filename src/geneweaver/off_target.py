@@ -48,11 +48,17 @@ def analyze_off_targets(
     off-target counts. It is not a biological safety prediction.
     """
 
-    required_fields = {
+    candidate_required_fields = {
         "start",
         "end",
         "strand",
         "mismatches",
+    }
+
+    intended_required_fields = {
+        "start",
+        "end",
+        "strand",
     }
 
     if not isinstance(candidates, list):
@@ -62,7 +68,7 @@ def analyze_off_targets(
         if not isinstance(intended_target, dict):
             raise TypeError("Intended target must be a dictionary.")
 
-        missing = required_fields - intended_target.keys()
+        missing = intended_required_fields - intended_target.keys()
 
         if missing:
             raise ValueError(
@@ -79,7 +85,7 @@ def analyze_off_targets(
         )
 
     for index, candidate in enumerate(candidates):
-        missing = required_fields - candidate.keys()
+        missing = candidate_required_fields - candidate.keys()
 
         if missing:
             raise ValueError(
