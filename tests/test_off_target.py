@@ -137,3 +137,64 @@ def test_analyze_off_targets_rejects_invalid_strand():
 
     with pytest.raises(ValueError):
         analyze_off_targets(candidates)
+
+
+def test_analyze_off_targets_handles_empty_candidates():
+    result = analyze_off_targets([])
+
+    assert result["guide_rna"] is None
+    assert result["candidate_site_count"] == 0
+    assert result["off_target_count"] is None
+    assert result["potential_off_targets"] == []
+
+
+def test_analyze_off_targets_rejects_missing_candidate_fields():
+    candidates = [
+        {
+            "guide_rna": "ATGC",
+            "start": 10,
+            "end": 14,
+            "strand": "+",
+        }
+    ]
+
+    with pytest.raises(ValueError, match="mismatches"):
+        analyze_off_targets(candidates)
+
+
+def test_analyze_off_targets_rejects_negative_mismatches():
+    candidates = [
+        make_candidate(10, 14, "+", -1),
+    ]
+
+    with pytest.raises(ValueError, match="Mismatch count"):
+        analyze_off_targets(candidates)
+
+
+def test_analyze_off_targets_rejects_invalid_coordinate_types():
+    candidates = [
+        make_candidate(True, 14, "+", 0),
+    ]
+
+    with pytest.raises(TypeError, match="start"):
+        analyze_off_targets(candidates)
+
+
+def test_analyze_off_targets_rejects_invalid_intended_coordinates():
+    intended = make_candidate(-1, 14, "+", 0)
+    candidates = [
+        make_candidate(10, 14, "+", 0),
+    ]
+
+    with pytest.raises(ValueError, match="coordinates"):
+        analyze_off_targets(candidates, intended)
+
+
+def test_group_candidates_rejects_empty_guide_rna():
+    candidates = [
+        make_candidate(10, 14, "+", 0, "   "),
+    ]
+
+    with pytest.raises(ValueError, match="guide RNA"):
+        group_candidates_by_guide(candidates)
+
