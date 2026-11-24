@@ -127,3 +127,112 @@ bases.
 
 The results establish an initial CPU performance baseline
 for evaluating future GPU acceleration and optimization.
+
+---
+
+## CUDA GPU Backend Verification
+
+### Verification Environment
+
+- Date: November 24, 2026
+- Python: 3.12.10
+- Platform: Windows
+- GPU: NVIDIA GeForce MX130
+- GPU Memory: 2 GB
+- NVIDIA Driver: 581.83
+- CUDA availability: Confirmed
+- Backend: Numba CUDA
+
+### Implementation
+
+A CUDA-accelerated DNA alignment backend was implemented in:
+
+`src/geneweaver/gpu_backend.py`
+
+The backend includes:
+
+- Integer encoding of DNA nucleotides.
+- CUDA kernel for parallel mismatch counting.
+- Exact DNA sequence matching.
+- Reverse-strand alignment.
+- Configurable mismatch tolerance.
+- Zero-based, end-exclusive alignment coordinates.
+- CUDA execution error handling.
+
+### GPU Correctness Verification
+
+The dedicated GPU test suite contains 10 tests.
+
+| Verification | Result |
+|---|---|
+| Exact forward matching | PASSED |
+| Reverse-strand matching | PASSED |
+| One-mismatch matching | PASSED |
+| Target longer than reference | PASSED |
+| Empty target validation | PASSED |
+| Negative mismatch validation | PASSED |
+| Invalid mismatch type | PASSED |
+| Boolean mismatch validation | PASSED |
+| CPU-GPU result parity | PASSED |
+| CUDA unavailable handling | PASSED |
+
+GPU-specific test results:
+
+- Tests passed: 10
+- Tests failed: 0
+- Execution time: 8.97 seconds
+
+### Full Project Regression Testing
+
+The complete GeneWeaver test suite was executed after
+integrating the CUDA backend.
+
+| Metric | Result |
+|---|---:|
+| Total tests | 169 |
+| Passed | 169 |
+| Failed | 0 |
+| Skipped | 0 |
+| Execution time | 8.51 seconds |
+
+All existing CPU processing, FASTA parsing, CRISPR search,
+PAM detection, candidate ranking, and off-target analysis
+tests continued to pass.
+
+### GPU Performance Observation
+
+A Numba performance warning was observed during small
+alignment tests:
+
+`Grid size 1 will likely result in GPU under-utilization`
+
+This warning indicates low GPU occupancy for small workloads.
+It does not indicate a CUDA execution failure.
+
+### Limitations and Future Improvements
+
+The current verification establishes GPU correctness,
+not GPU performance superiority.
+
+Future work will investigate:
+
+- Large-scale GPU alignment benchmarks.
+- CPU versus GPU execution-time comparisons.
+- CUDA kernel occupancy optimization.
+- GPU memory usage for large reference sequences.
+- Automatic CPU fallback integration.
+- Performance evaluation on larger DNA datasets.
+
+No GPU speedup claim is made at this verification stage.
+
+### Conclusion
+
+The initial CUDA alignment backend successfully executed
+on the NVIDIA GeForce MX130.
+
+All 10 dedicated GPU tests passed, including CPU-GPU
+result parity verification. The complete project regression
+suite also passed all 169 tests.
+
+This establishes a working GPU acceleration foundation
+for subsequent performance benchmarking and optimization.
