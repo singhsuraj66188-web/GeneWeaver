@@ -410,3 +410,117 @@ bases per second.
 
 These measurements establish an initial performance baseline
 for future GPU optimization and larger-scale genome alignment.
+
+## November 26, 2026 — Repeated CPU vs GPU Benchmark
+
+### Benchmark Configuration
+
+Hardware: NVIDIA GeForce MX130 (2 GB VRAM)
+
+Python: 3.12.10
+
+Operating system: Windows
+
+Target sequence length: 20 bases
+
+Strands tested: Forward and reverse
+
+Measurement runs: 7 per implementation and dataset
+
+Warm-up runs: 2 per implementation and dataset
+
+Primary measurement: Median execution time
+
+Additional measurements: Minimum and maximum execution times
+
+The benchmark used the existing CPU alignment implementation and
+CUDA GPU alignment backend. Both implementations were warmed up
+before collecting measurements.
+
+### Performance Results
+
+| Dataset | Reference Size | CPU Median (s) | GPU Median (s) | CPU Min (s) | CPU Max (s) | GPU Min (s) | GPU Max (s) | Speedup |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| Small | 10,000 | 0.035026 | 0.007210 | 0.032210 | 0.051573 | 0.006156 | 0.007782 | 4.858x |
+| Medium | 100,000 | 0.368436 | 0.038891 | 0.359168 | 0.388628 | 0.036762 | 0.042112 | 9.473x |
+| Large | 1,000,000 | 4.176174 | 0.363920 | 3.413645 | 6.275112 | 0.346935 | 0.754989 | 11.476x |
+
+### Throughput Results
+
+| Dataset | CPU Throughput (bases/second) | GPU Throughput (bases/second) |
+|---|---:|---:|
+| 10,000 | 285,503 | 1,387,001 |
+| 100,000 | 271,418 | 2,571,269 |
+| 1,000,000 | 239,454 | 2,747,856 |
+
+### Correctness Verification
+
+All three benchmark configurations successfully produced identical
+CPU and GPU alignment results.
+
+10,000-base dataset: PASSED
+
+100,000-base dataset: PASSED
+
+1,000,000-base dataset: PASSED
+
+Forward-strand alignment: VERIFIED
+
+Reverse-strand alignment: VERIFIED
+
+Zero-mismatch matching: VERIFIED
+
+No CPU-GPU result mismatches occurred.
+
+### Performance Analysis
+
+GPU execution was faster across all three tested datasets.
+
+The 10,000-base dataset achieved a 4.858x speedup.
+
+The 100,000-base dataset achieved a 9.473x speedup.
+
+The 1,000,000-base dataset achieved an 11.476x speedup.
+
+GPU throughput reached approximately 2.75 million bases per second
+on the largest tested dataset.
+
+CPU throughput ranged from approximately 239,454 to 285,503
+bases per second.
+
+The results show increasing GPU performance advantages across
+the tested reference sizes.
+
+The largest dataset showed greater variation between minimum
+and maximum execution times than the smaller datasets.
+Median execution time is therefore retained as the primary
+comparison metric.
+
+### Benchmark Warnings and Limitations
+
+Numba emitted a GPU occupancy warning for the small dataset.
+This warning indicates that the GPU may not be fully utilized
+for smaller workloads. It did not affect successful execution
+or correctness verification.
+
+The measurements include GPU memory transfers and alignment
+execution time. They represent local benchmark results on the
+NVIDIA GeForce MX130 and are not production performance guarantees.
+
+Only three reference sizes and a 20-base target sequence were
+evaluated. Further testing is required for larger reference
+genomes, different mismatch tolerances, and other GPU architectures.
+
+### Conclusion
+
+The repeated CPU-versus-GPU benchmark confirms that the
+GeneWeaver CUDA alignment backend outperformed the CPU
+implementation across all three tested datasets.
+
+The largest dataset achieved a measured speedup of 11.476x,
+with GPU throughput reaching approximately 2.75 million
+bases per second.
+
+Using seven measurement runs, two warm-up runs, and minimum,
+maximum, and median execution times provides a more detailed
+performance baseline for future optimization.

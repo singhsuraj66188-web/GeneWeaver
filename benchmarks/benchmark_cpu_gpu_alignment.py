@@ -25,8 +25,8 @@ def generate_reference(size, target):
     )
 
 
-def measure(function, runs=3):
-    """Return median execution time and final results."""
+def measure(function, runs=7):
+    """Return median, minimum, maximum execution times and results."""
     if not isinstance(runs, int) or isinstance(runs, bool) or runs < 1:
         raise ValueError("Runs must be a positive integer.")
 
@@ -39,7 +39,12 @@ def measure(function, runs=3):
         elapsed = time.perf_counter() - start
         timings.append(elapsed)
 
-    return statistics.median(timings), results
+    return {
+        "median": statistics.median(timings),
+        "minimum": min(timings),
+        "maximum": max(timings),
+        "results": results,
+    }
 
 
 def benchmark_cpu_gpu():
@@ -51,7 +56,8 @@ def benchmark_cpu_gpu():
         ("Large", 1_000_000),
     ]
 
-    runs = 3
+    runs = 7
+    warmup_runs = 2
 
     print("GeneWeaver CPU vs GPU Alignment Benchmark")
     print("=" * 65)
@@ -65,19 +71,13 @@ def benchmark_cpu_gpu():
 
     try:
         print(f"GPU device: {cuda.get_current_device().name}")
-
         print(f"Target length: {len(target)} bases")
-        print(f"Runs per implementation: {runs}")
+        print(f"Measurement runs: {runs}")
+        print(f"Warm-up runs per implementation: {warmup_runs}")
         print("Strands: Forward and reverse")
         print("-" * 65)
 
-        # Compile and warm up the CUDA kernel.
-        print("Warming up GPU...")
-        gpu_backend.find_matches_gpu(
-            "TTACGAAA",
-            "ACG",
-            both_strands=True,
-        )
+        benchmark_results = []
 
         for name, size in datasets:
             print(f"\n{name} dataset: {size:,} bases")
@@ -109,24 +109,49 @@ def benchmark_cpu_gpu():
 
             print("Correctness: PASSED")
 
-            cpu_time, _ = measure(cpu_function, runs)
-            gpu_time, _ = measure(gpu_function, runs)
+            # Warm up both implementations on this dataset.
+            for _ in range(warmup_runs):
+                cpu_function()
+                gpu_function()
+
+            print("CPU and GPU warm-up: COMPLETED")
+
+            # Collect repeated measurements.
+            cpu_measurements = measure(cpu_function, runs)
+            gpu_measurements = measure(gpu_function, runs)
+
+            cpu_time = cpu_measurements["median"]
+            gpu_time = gpu_measurements["median"]
 
             cpu_throughput = size / cpu_time
             gpu_throughput = size / gpu_time
             speedup = cpu_time / gpu_time
 
-            print(f"CPU median: {cpu_time:.6f} seconds")
-            print(f"GPU median: {gpu_time:.6f} seconds")
+            print("\nCPU measurements:")
+            print(f"  Median: {cpu_time:.6f} seconds")
             print(
-                f"CPU throughput: "
-                f"{cpu_throughput:,.0f} bases/second"
+                f"  Minimum: "
+                f"{cpu_measurements['minimum']:.6f} seconds"
             )
             print(
-                f"GPU throughput: "
-                f"{gpu_throughput:,.0f} bases/second"
+                f"  Maximum: "
+                f"{cpu_measurements['maximum']:.6f} seconds"
             )
-            print(f"CPU/GPU time ratio: {speedup:.3f}x")
+            print(f"  Throughput: {cpu_throughput:,.0f} bases/second")
+
+            print("\nGPU measurements:")
+            print(f"  Median: {gpu_time:.6f} seconds")
+            print(
+                f"  Minimum: "
+                f"{gpu_measurements['minimum']:.6f} seconds"
+            )
+            print(
+                f"  Maximum: "
+                f"{gpu_measurements['maximum']:.6f} seconds"
+            )
+            print(f"  Throughput: {gpu_throughput:,.0f} bases/second")
+
+            print(f"\nCPU/GPU time ratio: {speedup:.3f}x")
 
             if speedup > 1:
                 print("Observation: GPU was faster for this dataset.")
@@ -135,7 +160,15 @@ def benchmark_cpu_gpu():
             else:
                 print("Observation: Equal median execution times.")
 
-        print("\nBenchmark completed.")
+            benchmark_results.append({
+                "dataset": name,
+                "size": size,
+                "cpu": cpu_measurements,
+                "gpu": gpu_measurements,
+                "speedup": speedup,
+            })
+
+        print("\nBenchmark completed successfully.")
 
     except Exception as exc:
         print(f"\nBenchmark failed: {exc}")
