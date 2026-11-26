@@ -94,19 +94,19 @@ def find_matches_gpu(
             positions + threads_per_block - 1
         ) // threads_per_block
 
+        # Allocate GPU output memory once.
+        device_counts = cuda.device_array(
+            positions,
+            dtype=np.int32,
+        )
+
         for strand, query in strands:
             target_array = np.array(
                 [_BASE_ENCODING[base] for base in query],
                 dtype=np.int32,
             )
 
-            mismatch_counts = np.zeros(
-                positions,
-                dtype=np.int32,
-            )
-
             device_target = cuda.to_device(target_array)
-            device_counts = cuda.to_device(mismatch_counts)
 
             _count_mismatches_kernel[
                 blocks_per_grid, threads_per_block
@@ -134,5 +134,4 @@ def find_matches_gpu(
         raise RuntimeError(
             f"CUDA alignment execution failed: {exc}"
         ) from exc
-
     return results
